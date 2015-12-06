@@ -39,9 +39,9 @@ function clone(obj, ignoreKeys) {
     if (obj instanceof Array) {
         copy = [];
         for (var attr in obj) {
-            if (isNaN(attr) && ignoreKeys.indexOf(attr) < 0 ) {
-                copy[attr] = clone(obj[attr], ignoreKeys);
-            }
+  //          console.log(attr)
+  //          console.log(obj)
+            copy[attr] = clone(obj[attr], ignoreKeys);
         }
 
 //        for (var i = 0, len = obj.length; i < len; i++) {
@@ -75,14 +75,16 @@ function clone(obj, ignoreKeys) {
  */
 module.exports = function (actions) {
     var actions = actions || [];
-    var ignoreKeys = ["contents", "paths", "stats", "previous", "next", "mode", "collection"];
     return function (files, metalsmith, done) {
         var metadata;
         var key;
 
+
         metadata = metalsmith.metadata();
 
         actions.forEach(function (action_item) {
+            var ignoreKeys = action_item.ignore || [];
+
             metadata.collections[action_item.target] = metadata.collections[action_item.target] || {};
             switch(action_item.action) {
                 case "merge":
@@ -146,19 +148,19 @@ module.exports = function (actions) {
                                     action_item.fields.forEach(function(field) {
                                         var val = source[lang][topic][unit][stack][field];
                                         if (val) {
-                                            if (!~source[lang][topic][unit][field].indexOf(val) && val.length > 0) {
+                                            if (!~source[lang][topic][unit][field].indexOf(val) && val.length > 0 && val != "") {
 //                                                console.log(source[lang][topic][unit][field])
 //                                                console.log(lang + ":" + topic + ":" + unit + ":" + field)
 //                                                console.log(val)
                                                 source[lang][topic][unit][field].push(val);
                                             }
-                                            if (!~source[lang][topic][field].indexOf(val) && val.length > 0) {
+                                            if (!~source[lang][topic][field].indexOf(val) && val.length > 0 && val != "") {
 //                                                console.log(source[lang][topic][field])
 //                                                console.log(lang + ":" + topic + ":" + field)
 //                                                console.log(val)
                                                 source[lang][topic][field].push(val);
                                             }
-                                            if (!~source[lang][field].indexOf(val) && val.length > 0) {
+                                            if (!~source[lang][field].indexOf(val) && val.length > 0 && val != "") {
                                                 source[lang][field].push(val);
                                             }
                                         }
@@ -178,7 +180,7 @@ module.exports = function (actions) {
 //        console.log(metadata.collections.tree)
 //        console.log(Object.keys(metadata.collections.tree.en))
 //        console.log(metadata.collections.tree.en)
-//        console.log(metadata.collections.tree.en["safe-social-networks"]["getting-started"])
+//        console.log(metadata.collections.tree.en["practice-safe-social-networks"]["getting-started"])
         done();
     };
 };
